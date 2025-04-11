@@ -15,7 +15,7 @@ const WelcomePage = () => {
           </p>
           <p className="text-[#717B84] font-extrabold lg:text-[32px] sm:text-[28px] pb-10">Zdrowie zaczyna się na talerzu</p>
           <p className="font-semibold text-[23px] pb-8">Zacznij jeść świadomie – twórz spersonalizowane jadłospisy, kontroluj kalorie i odkryj, jak łatwe może być zdrowe odżywianie.</p>
-          <Link to="\register">
+          <Link to="/register">
           <button className="bg-[#091B2B] self-center text-white py-5 px-10 rounded-[40px] text-[16px] font-semibold drop-shadow-2xl hover:shadow-xl transition-all cursor-pointer">
           DOŁĄCZ TERAZ!
           </button>

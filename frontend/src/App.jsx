@@ -6,6 +6,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import WelcomePage from './pages/WelcomePage'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 // function App() {
 //   const [count, setCount] = useState(0)
 
@@ -68,6 +69,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<WelcomePage />}/>
         <Route path="/login" element={<LoginPage />}/>
+        <Route path="/register" element={<RegisterPage />}/>
       </Routes>
     </BrowserRouter>
   )
