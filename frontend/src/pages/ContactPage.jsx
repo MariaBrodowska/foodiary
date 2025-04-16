@@ -1,10 +1,12 @@
 import React from "react";
 import ContactPageBackground from "../components/ContactPageBackground";
+import NavbarNotAuth from "../components/NavbarNotAuth";
 
 const ContactPage = () => {
     return (
         <div className='bg-[#F6F2E9] h-screen w-full relative flex'>
             <ContactPageBackground />
+            <NavbarNotAuth/>
 
             <p className="text-black absolute flex items-center top-1/5 left-1/5 font-extrabold lg:text-[54px]">Skontaktuj się z nami<p className="text-[#717B84] text-[90px] pb-6">.</p></p>
 
@@ -23,7 +25,7 @@ const ContactPage = () => {
                     <p className="text-[#000000] font-semibold text-[18px] self-start pt-8 pb-2">Email</p>
                     <input type="email" id="email" name="email" required className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-4" />
                     <p className="text-[#000000] font-semibold text-[18px] self-start pt-5 pb-2">Wiadomość</p>
-                    <input type="message" id="message" name="message" required className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-4 h-40" />
+                    <textarea type="message" id="message" name="message" placeholder="Napisz wiadomość" required className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-4 h-40" />
                     <input type="submit" className="bg-[#091B2B] w-full self-center text-white py-5 rounded-[40px] text-[16px] font-semibold drop-shadow-2xl hover:shadow-xl transition-all cursor-pointer mt-8" value="WYŚLIJ WIADOMOŚĆ" />
                 </form>
             </div>

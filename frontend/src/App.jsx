@@ -8,6 +8,7 @@ import WelcomePage from './pages/WelcomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ContactPage from './pages/ContactPage'
+import SamplePlans from './pages/SamplePlans'
 
 // function App() {
 //   const [count, setCount] = useState(0)
@@ -73,6 +74,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />}/>
         <Route path="/register" element={<RegisterPage />}/>
         <Route path="/contact" element={<ContactPage />}/>
+        <Route path="/sampleplans" element={<SamplePlans />}/>
       </Routes>
     </BrowserRouter>
   )

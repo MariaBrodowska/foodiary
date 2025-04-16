@@ -4,12 +4,14 @@ import { Link } from "react-router-dom";
 import Logo1 from "../components/Logo1";
 import Button from "../components/Button";
 import Input from "../components/Input";
+import NavbarNotAuth from "../components/NavbarNotAuth";
 
 const RegisterPage = () => {
     return (
     <div className='bg-[#F6F2E9] min-h-screen w-full relative flex justify-center items-center overflow-x-hidden'>
         <WelcomePageBackground />
         <Logo1/>
+        <NavbarNotAuth/>
 
         <form className="flex flex-col relative items-center w-2/3 max-w-3xl bg-[#ffffff] rounded-[30px] lg:px-20 lg:py-13 sm:p-15 shadow-[0px_4px_30px_10px_rgba(0,0,0,0.15)] mt-30 mb-20">
             <p className="text-[#000000] font-bold lg:text-[48px] sm:text-[38px] pb-5">Rejestracja</p>
