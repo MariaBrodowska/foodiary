@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import WelcomePage from './pages/WelcomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import ContactPage from './pages/ContactPage'
 import SamplePlans from './pages/SamplePlans'
+import DashboardPage from './pages/DashboardPage'
 
 // function App() {
 //   const [count, setCount] = useState(0)
@@ -75,6 +73,7 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />}/>
         <Route path="/contact" element={<ContactPage />}/>
         <Route path="/sampleplans" element={<SamplePlans />}/>
+        <Route path="/sg" element={<DashboardPage />}/>
       </Routes>
     </BrowserRouter>
   )
