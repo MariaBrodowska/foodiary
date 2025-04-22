@@ -34,9 +34,14 @@ services:
   mongo:
     image: mongo
     restart: always
+    ports:
+      - '27017:27017'
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${ME_CONFIG_MONGODB_ADMINUSERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${ME_CONFIG_MONGODB_ADMINPASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    volumes:
+      - mongo_data:/data/db
 
   mongo-express:
     image: mongo-express
@@ -48,3 +53,8 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=${ME_CONFIG_MONGODB_ADMINPASSWORD}
       - ME_CONFIG_MONGODB_URL=${ME_CONFIG_MONGODB_URL}
       - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
