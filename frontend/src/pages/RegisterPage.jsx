@@ -1,12 +1,66 @@
 import React, { useState } from "react";
 import WelcomePageBackground from "../components/WelcomePageBackground";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Logo1 from "../components/Logo1";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import NavbarNotAuth from "../components/NavbarNotAuth";
+import { useAuthContext } from "../hooks/useAuthContext"; 
 
 const RegisterPage = () => {
+    const navigate = useNavigate();
+    const { dispatch } = useAuthContext();
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+        sex: "",
+        activity: "",
+        height: "",
+        weight: ""
+    });
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log("Przeslane dane:", formData);
+        setIsLoading(true);
+        setError(null);
+
+        try{
+            const response = await fetch('/api/user/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
+    
+            const json = await response.json();
+    
+            if (!response.ok) {
+                setError(json.error || "Wystąpił błąd podczas rejestracji");
+                setIsLoading(false);
+                return;
+            }
+    
+            dispatch({type: 'LOGIN', payload: json});
+            setIsLoading(false);
+            navigate('/dashboard');
+        }
+        catch (err) {
+            setIsLoading(false);
+            setError(err.message);
+        }
+    };
+
     return (
         <div className='bg-[#F6F2E9] min-h-screen w-full relative flex justify-center items-center overflow-x-hidden'>
             <WelcomePageBackground />
@@ -19,8 +73,14 @@ const RegisterPage = () => {
                     Witaj! Uzupełnij swoje dane, aby zarządzać dietą
                 </p>
 
+                {error && (
+                    <div className="w-full p-4 my-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {error}
+                    </div>
+                )}
+
                 <Input label={"Email"} name={"email"} value={formData.email} onChange={handleChange} />
-                <Input label={"Hasło"} name={"password"} value={formData.password} onChange={handleChange} />
+                <Input label={"Hasło"} name={"password"} type="password" value={formData.password} onChange={handleChange} />
 
                 <div className="flex justify-between w-full space-x-10">
                     <div className="flex flex-col w-1/4">
@@ -46,21 +106,25 @@ const RegisterPage = () => {
                 <div className="flex justify-between w-full space-x-10">
                     <div className="flex flex-col w-1/2">
                         <p className="text-black font-semibold text-[22px] self-start pt-8 pb-2">Wzrost</p>
-                        <div className="flex items-center rounded-[20px] p-4 w-full border-1 border-solid border-[#000000]">
+                        <div className="flex items-center rounded-[20px] py-4 px-4 w-full border-1 border-solid border-[#000000]">
                             <input type="number" id="height" name="height" value={formData.height} onChange={handleChange} className="flex-grow outline-none text-black bg-transparent" />
-                            <span className="ml-2 font-semibold text-black">cm</span>
+                            <span className="px-2 font-semibold text-black">cm</span>
                         </div>
                     </div>
                     <div className="flex flex-col w-1/2">
                         <p className="text-black font-semibold text-[22px] self-start pt-8 pb-2">Waga</p>
-                        <div className="flex items-center rounded-[20px] p-4 w-full border-1 border-solid border-[#000000]">
+                        <div className="flex items-center rounded-[20px] py-4 px-4 w-full border-1 border-solid border-[#000000]">
                             <input type="number" id="weight" name="weight" value={formData.weight} onChange={handleChange} className="flex-grow outline-none text-black bg-transparent" />
-                            <span className="ml-2 font-semibold text-black">kg</span>
+                            <span className="px-2 font-semibold text-black">kg</span>
                         </div>
                     </div>
                 </div>
 
-                <Button value={"ZAŁÓŻ KONTO"} />
+                <Button 
+                    value={isLoading ? "PRZETWARZANIE..." : "ZAŁÓŻ KONTO"} 
+                    disabled={isLoading}
+                    extraClasses={isLoading ? "opacity-70 cursor-not-allowed" : ""}
+                />
 
                 <p className="text-[#000000] font-semibold text-[20px] mt-8 text-center">
                     Masz już konto?
