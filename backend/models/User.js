@@ -67,4 +67,20 @@ userSchema.statics.register = async function(email, password, sex, activity, hei
     return user
 }
 
+userSchema.statics.login = async function(email, password){
+    if(!email || !password){
+        throw Error("Wszystkie pola muszą być uzupełnione")
+    }
+
+    const user = await this.findOne({ email });
+    if (!user){
+        throw Error("Email nie jest używany");
+    }
+    const match = await bcrypt.compare(password, user.password);
+    if(!match){
+        throw Error("Hasło nie jest prawidłowe");
+    }
+    return user;
+}
+
 module.exports = mongoose.model("User", userSchema);
