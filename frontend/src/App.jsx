@@ -7,13 +7,13 @@ import RegisterPage from './pages/RegisterPage'
 import ContactPage from './pages/ContactPage'
 import SamplePlans from './pages/SamplePlans'
 import DashboardPage from './pages/DashboardPage'
-import { AuthContextProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
+import MealPlansPage from './pages/MealPlansPage'
+import MyPlansPage from './pages/MyPlansPage'
 
 const App = () => {
   return (
-    <AuthContextProvider>
       <BrowserRouter>
         <Routes>
           {/* publiczne */}
@@ -22,9 +22,7 @@ const App = () => {
 
           {/* dla niezalogowanycyh */}
           <Route path="/login" element={
-            <PublicRoute>
             <LoginPage />
-            </PublicRoute>
             } />
           <Route path="/register" element={
             <PublicRoute>
@@ -38,9 +36,14 @@ const App = () => {
           <Route path="/dashboard" element={
             <ProtectedRoute><DashboardPage /></ProtectedRoute>
             } />
+          <Route path="/mealplans" element={
+            <ProtectedRoute><MealPlansPage /></ProtectedRoute>
+            } />
+          <Route path="/myplans" element={
+            <ProtectedRoute><MyPlansPage /></ProtectedRoute>
+            } />
         </Routes>
       </BrowserRouter>
-    </AuthContextProvider>
   )
 }
 

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+require('dotenv').config();
 
 const requireAuth = async (req, res, next) => {
     try {
@@ -8,8 +9,9 @@ const requireAuth = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({error: 'Wymagane uwierzytelnienie'});
         }
-        
-        const { _id } = jwt.verify(token, process.env.SECRET);
+        // console.log('Token:', token);
+        // console.log('Secret:', process.env.SECRET);
+        const { _id } = jwt.verify(token, process.env.JWT_SECRET);
         
         req.user = await User.findOne({ _id }).select('_id');
         next();

@@ -1,12 +1,11 @@
 import { Navigate } from 'react-router-dom';
-import { useAuthContext } from '../hooks/useAuthContext';
 
 const PublicRoute = ({ children }) => {
-  const { user } = useAuthContext();
+  // const { user } = useAuthContext();
   
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // if (user) {
+  //   // return <Navigate to="/dashboard" replace />;
+  // }
   
   return children;
 };

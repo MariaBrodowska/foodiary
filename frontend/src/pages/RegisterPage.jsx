@@ -5,18 +5,19 @@ import Logo1 from "../components/Logo1";
 import Button from "../components/Button";
 import Input from "../components/Input";
 import NavbarNotAuth from "../components/NavbarNotAuth";
-import { useAuthContext } from "../hooks/useAuthContext"; 
+import axios from "axios";
 
 const RegisterPage = () => {
     const navigate = useNavigate();
-    const { dispatch } = useAuthContext();
     const [formData, setFormData] = useState({
         email: "",
         password: "",
         sex: "",
         activity: "",
         height: "",
-        weight: ""
+        weight: "",
+        goal: "",
+        age: ""
     });
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -31,33 +32,35 @@ const RegisterPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!formData.email || !formData.password || !formData.sex || !formData.activity || !formData.height || !formData.weight || !formData.goal || !formData.age) {
+            setError('Wszystkie pola są wymagane');
+            return;
+        }
+
         console.log("Przeslane dane:", formData);
         setIsLoading(true);
         setError(null);
-
-        try{
-            const response = await fetch('/api/user/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(formData),
-                credentials: 'include'
+    
+        try {
+            const response = await axios.post('http://localhost:3000/api/user/register', formData, {
+                withCredentials: true
             });
     
-            const json = await response.json();
-    
-            if (!response.ok) {
-                setError(json.error || "Wystąpił błąd podczas rejestracji");
-                setIsLoading(false);
-                return;
-            }
-    
-            dispatch({type: 'LOGIN', payload: json});
+            console.log('Rejestracja udana:', response.data);
             setIsLoading(false);
+            
             navigate('/dashboard');
-        }
-        catch (err) {
+            
+        } catch (err) {
+            console.error('Błąd podczas rejestracji:', err);
             setIsLoading(false);
-            setError(err.message);
+            
+            if (err.response && err.response.data && err.response.data.error) {
+                setError(err.response.data.error);
+            } else {
+                setError('Wystąpił błąd podczas rejestracji');
+            }
         }
     };
 
@@ -120,6 +123,27 @@ const RegisterPage = () => {
                     </div>
                 </div>
 
+          
+
+
+                    <div className="flex justify-between w-full space-x-10">
+                    <div className="flex flex-col w-1/2">
+                        <p className="text-black font-semibold text-[22px] self-start pt-8 pb-2">Wiek</p>
+                        <div className="flex items-center rounded-[20px] py-4 px-4 w-full border-1 border-solid border-[#000000]">
+                            <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} className="flex-grow outline-none text-black bg-transparent" />
+                            <span className="px-2 font-semibold text-black">lat(a)</span>
+                        </div>
+                    </div>
+                    <div className="flex flex-col w-1/2">
+                        <label htmlFor="goal" className="text-[#000000] font-semibold text-[22px] self-start pt-8 pb-2">Cel</label>
+                        <select name="goal" id="goal" value={formData.goal} onChange={handleChange} className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-4">
+                            <option value="">Wybierz</option>
+                            <option value="maintainWeight">Utrzymać wagę</option>
+                            <option value="loseWeight">Schudnąć</option>
+                            <option value="gainWeight">Przytuć</option>
+                        </select>
+                    </div>
+                </div>
                 <Button 
                     value={isLoading ? "PRZETWARZANIE..." : "ZAŁÓŻ KONTO"} 
                     disabled={isLoading}
