@@ -57,7 +57,12 @@ const userSchema = new mongoose.Schema({
         tdee: { type: Number },
         targetCalories: { type: Number },
         waterIntake: { type: Number }
-    }
+    },
+    shoppingList: [{
+        product: { type: String, required: true },
+        quantity: { type: String, required: true },
+        purchased: { type: Boolean, default: false }
+    }]
 });
 
 userSchema.statics.register = async function(email, password, sex, activity, height, weight, goal, age){
@@ -268,5 +273,24 @@ userSchema.statics.updateUser = async function (id, updates) {
     await user.save();
     return user;
 };
+
+
+userSchema.statics.addShoppingItem = async function (userId, product, quantity) {
+    if(!product || !quantity){
+        throw Error("Nazwa produktu i ilość są wymagane");
+    }
+    const user = await this.findById(userId);
+    if (!user){
+        throw Error("Użytkownik nie został znaleziony")
+    }
+
+    user.shoppingList.push({
+        product,
+        quantity,
+        purchased: false
+    });
+    await user.save();
+    return user;
+}
 
 module.exports = mongoose.model("User", userSchema);

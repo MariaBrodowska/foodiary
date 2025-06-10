@@ -73,8 +73,6 @@ const logoutUser = async (req, res) => {
 const getUserEmail = async (req, res) => {
     try {
         const token = req.cookies.token;
-        console.log('🔑 Token:', token ? 'Istnieje' : 'Brak tokena');
-
         if (!token) {
             return res.status(401).json({ message: "Nie zalogowany" });
         }
@@ -96,8 +94,6 @@ const getUserEmail = async (req, res) => {
 const getUserData = async (req, res) => {
     try {
         const token = req.cookies.token;
-        console.log('🔑 Token:', token ? 'Istnieje' : 'Brak tokena');
-
         if (!token) {
             return res.status(401).json({ message: "Nie zalogowany" });
         }
@@ -124,4 +120,36 @@ const getUserData = async (req, res) => {
     }
 };
 
-module.exports = { loginUser, registerUser, getUserStatus, getUserEmail, logoutUser, getUserData }
+const getShoppingList = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "Nie zalogowany" });
+        }
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decodedToken._id);
+        if (!user) {
+            return res.status(404).json({ message: "Użytkownik nie znaleziony" });
+        }
+        
+        console.log('Zwracanie listy zakupów:', user.email);
+        res.status(200).json({
+            additionalData: user.shoppingList
+        });
+    } catch (error) {
+        console.error('Błąd weryfikacji tokenu:', error);
+        res.status(401).json({ message: "Sesja wygasła lub nieprawidłowy token" });
+    }
+};
+
+const addShoppingItem = async (req, res) => {
+    const {userId, product, quantity} = req.body;
+    try {
+        const user = await User.addShoppingItem(userId, product, quantity);
+        res.status(200).json({ message: "Dodano produkt"});
+    } catch (error){
+        res.status(400).json({error: error.message});
+    }
+}
+
+module.exports = { loginUser, registerUser, getUserStatus, getUserEmail, logoutUser, getUserData, getShoppingList, addShoppingItem}
