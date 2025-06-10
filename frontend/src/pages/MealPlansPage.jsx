@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import NavbarAuth from "../components/NavbarAuth";
 import Logo2 from "../components/Logo2";
 import MealPlansList from "../components/MealPlansList";
 import IngredientSelector from "../components/IngredientSelector";
+import { useSearchParams } from "react-router-dom";
 
 const BackgroundImages = () => (
   <>
@@ -15,6 +16,7 @@ const BackgroundImages = () => (
 );
 
 const DietPlansSection = () => {
+  const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState({
     dietType: "",
     calories: "",
@@ -25,6 +27,20 @@ const DietPlansSection = () => {
     calories: 2000,
     ingredients: [],
   });
+
+  useEffect(() => {
+    const dietFromUrl = searchParams.get("diet");
+    if (dietFromUrl) {
+      setFilters((prev) => ({
+        ...prev,
+        dietType: dietFromUrl,
+      }));
+      setAppliedFilters((prev) => ({
+        ...prev,
+        dietType: dietFromUrl,
+      }));
+    }
+  }, [searchParams]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

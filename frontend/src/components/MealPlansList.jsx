@@ -22,7 +22,7 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
         const baseParams = {
           timeFrame: "day",
           targetCalories: targetCalories,
-          apiKey: import.meta.env.SPOONACULAR_API_KEY,
+          apiKey: import.meta.env.VITE_SPOONACULAR_API_KEY,
         };
 
         if (diet) {
@@ -34,7 +34,7 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
           baseParams.includeIngredients = translatedIngredients;
         }
 
-        const promises = Array.from({ length: 18 }, (_, index) =>
+        const promises = Array.from({ length: 7 }, (_, index) =>
           axios
             .get("https://api.spoonacular.com/mealplanner/generate", {
               params: baseParams,
@@ -281,13 +281,13 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
                 </h3>
                 <p className="text-gray-600 mt-2">{plan.description}</p>
                 <p className="text-sm text-gray-500 mt-1">
-                  {plan.meals.length} posiłków • {plan.nutrients.calories} kcal
+                  {plan.nutrients.calories} kcal
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col items-end">
-              <button className="bg-[#EFBD4C] hover:bg-yellow-500 text-black px-8 py-3 rounded-3xl font-semibold">
+              <button className="bg-[#EFBD4C] hover:bg-yellow-500 text-black mx-4 px-4 py-3 rounded-3xl font-semibold text-md">
                 ZOBACZ JADŁOSPIS
               </button>
             </div>
