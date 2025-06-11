@@ -58,9 +58,13 @@ const DietPlansSection = () => {
   };
 
   const handleSearch = () => {
+    var caloriesValue = parseInt(filters.calories);
+    if (isNaN(caloriesValue) || caloriesValue <= 0) {
+      caloriesValue = 2000;
+    }
     setAppliedFilters({
       dietType: filters.dietType,
-      calories: parseInt(filters.calories),
+      calories: caloriesValue,
       ingredients: filters.ingredients,
     });
   };

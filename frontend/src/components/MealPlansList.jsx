@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { translateIngredients } from "../data/ingredients";
+import useLikedPlans from "../hooks/useLikedPlans";
 
 const MealPlansList = ({ targetCalories, diet, ingredients }) => {
   const [mealPlans, setMealPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedMeal, setSelectedMeal] = useState(null);
-  const [likedMeals, setLikedMeals] = useState(new Set());
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const { toggleLike, isLiked } = useLikedPlans();
 
   const plansPerPage = 6;
 
@@ -23,18 +25,14 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
           timeFrame: "day",
           targetCalories: targetCalories,
           apiKey: import.meta.env.VITE_SPOONACULAR_API_KEY,
+          exclude: translateIngredients(ingredients),
         };
 
         if (diet) {
           baseParams.diet = diet;
         }
 
-        if (ingredients && ingredients.length > 0) {
-          const translatedIngredients = translateIngredients(ingredients);
-          baseParams.includeIngredients = translatedIngredients;
-        }
-
-        const promises = Array.from({ length: 7 }, (_, index) =>
+        const promises = Array.from({ length: 1 }, (_, index) =>
           axios
             .get("https://api.spoonacular.com/mealplanner/generate", {
               params: baseParams,
@@ -46,7 +44,7 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
                 ingredients && ingredients.length > 0
                   ? `Plan żywieniowy ${index + 1} - ${
                       diet || "ogólny"
-                    } (ze składnikami: ${ingredients.join(", ")})`
+                    } (bez składników: ${ingredients.join(", ")})`
                   : `Plan żywieniowy ${index + 1} - ${diet || "ogólny"}`,
               meals: response.data.meals,
               nutrients: response.data.nutrients,
@@ -65,18 +63,6 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
     fetchMealPlans();
     setCurrentPage(1);
   }, [targetCalories, diet, ingredients]);
-
-  const toggleLike = (mealId) => {
-    setLikedMeals((prev) => {
-      const newLiked = new Set(prev);
-      if (newLiked.has(mealId)) {
-        newLiked.delete(mealId);
-      } else {
-        newLiked.add(mealId);
-      }
-      return newLiked;
-    });
-  };
 
   const selectPlan = (plan) => {
     setSelectedPlan(plan);
@@ -218,17 +204,6 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
                   ZOBACZ SZCZEGÓŁY
                 </button>
               </div>
-
-              <div
-                className="absolute top-3 right-4 text-xl cursor-pointer"
-                onClick={() => toggleLike(meal.id)}
-              >
-                {likedMeals.has(meal.id) ? (
-                  <span className="text-red-500">❤️</span>
-                ) : (
-                  <span className="text-black">🖤</span>
-                )}
-              </div>
             </div>
           ))}
         </div>
@@ -276,7 +251,7 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
               </div>
 
               <div className="flex flex-col">
-                <h3 className="font-bold text-xl text-[#FFC440]">
+                <h3 className="font-bold text-xl text-[#0D2C2E]">
                   {plan.name}
                 </h3>
                 <p className="text-gray-600 mt-2">{plan.description}</p>
@@ -287,7 +262,58 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
             </div>
 
             <div className="flex flex-col items-end">
-              <button className="bg-[#EFBD4C] hover:bg-yellow-500 text-black mx-4 px-4 py-3 rounded-3xl font-semibold text-md">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  const mealIds = plan.meals.map((meal) => meal.id).join("-");
+                  const contentHash = btoa(mealIds).slice(0, 8); //hash z id posilkow
+
+                  const planId = `plan_${plan.id}_${contentHash}_${
+                    diet || "general"
+                  }_${targetCalories}`;
+
+                  const planData = {
+                    id: planId,
+                    title: plan.name,
+                    description: plan.description,
+                    diets: [diet || "Ogólny"],
+                    nutrition: {
+                      calories: plan.nutrients.calories,
+                      protein: plan.nutrients.protein,
+                      fat: plan.nutrients.fat,
+                      carbohydrates: plan.nutrients.carbohydrates,
+                    },
+                    meals: plan.meals,
+                  };
+
+                  toggleLike(planId, planData);
+                }}
+                className="mb-2 text-2xl hover:scale-110 transition-transform"
+                title={(() => {
+                  const mealIds = plan.meals.map((meal) => meal.id).join("-");
+                  const contentHash = btoa(mealIds).slice(0, 8);
+                  const planId = `plan_${plan.id}_${contentHash}_${
+                    diet || "general"
+                  }_${targetCalories}`;
+                  return isLiked(planId)
+                    ? "Usuń z ulubionych"
+                    : "Dodaj do ulubionych";
+                })()}
+              >
+                {(() => {
+                  const mealIds = plan.meals.map((meal) => meal.id).join("-");
+                  const contentHash = btoa(mealIds).slice(0, 8);
+                  const planId = `plan_${plan.id}_${contentHash}_${
+                    diet || "general"
+                  }_${targetCalories}`;
+                  return isLiked(planId) ? "❤️" : "🖤";
+                })()}
+              </button>
+              <button
+                onClick={() => selectPlan(plan)}
+                className="bg-[#EFBD4C] hover:bg-yellow-500 text-black mx-4 px-4 py-3 rounded-3xl font-semibold text-md"
+              >
                 ZOBACZ JADŁOSPIS
               </button>
             </div>

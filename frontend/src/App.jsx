@@ -12,6 +12,7 @@ import MealPlansPage from "./pages/MealPlansPage";
 import MyPlansPage from "./pages/MyPlansPage";
 import ShoppingList from "./pages/ShoppingList";
 import ProfilePage from "./pages/ProfilePage";
+import FavoritePlansPage from "./pages/FavoritePlansPage";
 
 const App = () => {
   return (
@@ -80,6 +81,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favourite"
+          element={
+            <ProtectedRoute>
+              <FavoritePlansPage />
             </ProtectedRoute>
           }
         />

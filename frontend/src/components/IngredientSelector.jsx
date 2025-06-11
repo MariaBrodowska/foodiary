@@ -27,7 +27,7 @@ const IngredientSelector = ({ selectedIngredients, onIngredientsChange }) => {
   return (
     <div className="relative">
       <label className="text-gray-700 font-semibold block mb-2">
-        Składniki, które masz:
+        Składniki do wykluczenia:
       </label>
 
       {selectedIngredients.length > 0 && (
@@ -35,12 +35,12 @@ const IngredientSelector = ({ selectedIngredients, onIngredientsChange }) => {
           {selectedIngredients.map((ingredient) => (
             <span
               key={ingredient}
-              className="bg-[#EFBD4C] text-black px-3 py-1 rounded-full text-sm flex items-center gap-2"
+              className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm flex items-center gap-2 border border-red-200"
             >
               {ingredient}
               <button
                 onClick={() => removeIngredient(ingredient)}
-                className="text-black hover:text-red-600 font-bold"
+                className="text-red-600 hover:text-red-800 font-bold"
               >
                 ×
               </button>
@@ -62,8 +62,8 @@ const IngredientSelector = ({ selectedIngredients, onIngredientsChange }) => {
       >
         <span className="text-gray-500">
           {selectedIngredients.length === 0
-            ? "Wybierz składniki z listy..."
-            : `Wybrano ${selectedIngredients.length} składników`}
+            ? "Wybierz składniki do wykluczenia..."
+            : `Wykluczono ${selectedIngredients.length} składników`}
         </span>
         <span
           className={`transform transition-transform ${
@@ -129,7 +129,7 @@ const IngredientSelector = ({ selectedIngredients, onIngredientsChange }) => {
       )}
 
       <p className="text-xs text-gray-500 mt-1">
-        💡 Wybierz składniki, które masz w kuchni
+        🚫 Wybierz składniki, których nie chcesz w swoich posiłkach
       </p>
     </div>
   );
