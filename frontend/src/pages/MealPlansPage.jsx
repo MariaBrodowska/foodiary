@@ -139,7 +139,7 @@ const MealPlansPage = () => {
     <div className="bg-[#F6F2E9] min-h-screen w-full flex flex-col items-center overflow-x-hidden">
       <Logo2 />
 
-      <div className="absolute top-0 left-0 w-full z-10">
+      <div className="absolute top-0 left-0 w-full z-20">
         <NavbarAuth />
       </div>
 

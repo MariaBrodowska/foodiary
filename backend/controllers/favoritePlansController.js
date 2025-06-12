@@ -1,14 +1,5 @@
 const FavoritePlan = require("../models/FavoritePlan");
-const jwt = require("jsonwebtoken");
-
-const getUserIdFromToken = (req) => {
-  const token = req.cookies.token;
-  if (!token) {
-    throw new Error("Nie zalogowany");
-  }
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-  return decodedToken._id;
-};
+const { getUserIdFromToken } = require("../middleware/requireAuth");
 
 const addFavoritePlan = async (req, res) => {
   try {
@@ -18,7 +9,7 @@ const addFavoritePlan = async (req, res) => {
     if (!planData || !planData.id) {
       return res.status(400).json({ error: "Nieprawidłowe dane planu" });
     }
-
+    console.log(planData);
     await FavoritePlan.addFavorite(userId, planData);
     res.status(200).json({ message: "Plan dodany do ulubionych" });
   } catch (error) {

@@ -97,7 +97,7 @@ const FavoritePlansSection = () => {
                     )}
                   </div>
                   <p className="text-gray-600 mb-3">{plan.description}</p>
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
+                  <div className="flex items-center gap-6 text-sm text-gray-900">
                     <span>
                       📅 Dodano: {new Date(plan.addedAt).toLocaleDateString()}
                     </span>
@@ -132,7 +132,7 @@ const FavoritePlansSection = () => {
                           <img
                             src={`https://spoonacular.com/recipeImages/${meal.image}`}
                             alt={meal.title}
-                            className="w-12 h-12 object-cover rounded-lg"
+                            className="w-25 h-25 object-cover rounded-lg"
                             onError={(e) => {
                               e.target.style.display = "none";
                             }}
@@ -208,7 +208,7 @@ const FavoritePlansPage = () => {
     <div className="bg-[#F6F2E9] min-h-screen w-full flex flex-col items-center overflow-x-hidden">
       <Logo2 />
 
-      <div className="absolute top-0 left-0 w-full z-10">
+      <div className="absolute top-0 left-0 w-full z-20">
         <NavbarAuth />
       </div>
 

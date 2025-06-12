@@ -12,6 +12,7 @@ import MealPlansPage from "./pages/MealPlansPage";
 import MyPlansPage from "./pages/MyPlansPage";
 import ShoppingList from "./pages/ShoppingList";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import FavoritePlansPage from "./pages/FavoritePlansPage";
 
 const App = () => {
@@ -21,6 +22,7 @@ const App = () => {
         {/* publiczne */}
         <Route path="/" element={<WelcomePage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/sampleplans" element={<SamplePlans />} />
 
         {/* dla niezalogowanycyh */}
         <Route path="/login" element={<LoginPage />} />
@@ -32,8 +34,6 @@ const App = () => {
             </PublicRoute>
           }
         />
-
-        <Route path="/sampleplans" element={<SamplePlans />} />
 
         {/* chronione */}
         <Route
@@ -80,7 +80,7 @@ const App = () => {
           path="/settings"
           element={
             <ProtectedRoute>
-              <ProfilePage />
+              <SettingsPage />
             </ProtectedRoute>
           }
         />

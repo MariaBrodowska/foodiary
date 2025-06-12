@@ -192,39 +192,43 @@ const Diets = () => {
   ];
 
   return (
-    <div className="relative w-full bg-white py-16 px-8 mt-20">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="font-bold text-[36px] text-gray-800 mb-4">
-            Dostępne rodzaje diet
-          </h2>
-          <p className="text-[20px] text-gray-600 max-w-3xl mx-auto">
-            Wybierz rodzaj diety, który najbardziej odpowiada Twoim potrzebom i
-            preferencjom żywieniowym
-          </p>
-        </div>
+    <>
+      <div className="relative bg-[#EFBD4C] mt-20 h-2 w-full"></div>
+      <div className="relative w-full bg-white py-16 px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="font-bold text-[36px] text-gray-800 mb-4">
+              Dostępne rodzaje diet
+            </h2>
+            <p className="text-[20px] text-gray-600 max-w-3xl mx-auto">
+              Wybierz rodzaj diety, który najbardziej odpowiada Twoim potrzebom
+              i preferencjom żywieniowym
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {diets.map((diet) => (
-            <DietCard
-              key={diet.dietType}
-              dietType={diet.dietType}
-              dietName={diet.dietName}
-              description={diet.description}
-              icon={diet.icon}
-            />
-          ))}
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {diets.map((diet) => (
+              <DietCard
+                key={diet.dietType}
+                dietType={diet.dietType}
+                dietName={diet.dietName}
+                description={diet.description}
+                icon={diet.icon}
+              />
+            ))}
+          </div>
 
-        <div className="text-center mt-12">
-          <Link to="/mealplans">
-            <button className="bg-[#EFBD4C] hover:bg-yellow-500 text-black py-4 px-8 rounded-[40px] text-[16px] font-semibold drop-shadow-lg hover:shadow-xl transition-all">
-              ZOBACZ WSZYSTKIE PLANY
-            </button>
-          </Link>
+          <div className="text-center mt-12">
+            <Link to="/mealplans">
+              <button className="bg-[#EFBD4C] hover:bg-yellow-500 text-black py-4 px-8 rounded-[40px] text-[16px] font-semibold drop-shadow-lg hover:shadow-xl transition-all">
+                ZOBACZ WSZYSTKIE PLANY
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+      <div className="relative bg-[#EFBD4C] h-2 w-full"></div>
+    </>
   );
 };
 
@@ -250,7 +254,8 @@ const DashboardPage = () => {
   return (
     <div className="bg-[#F6F2E9] min-h-screen w-full flex flex-col items-center overflow-x-hidden">
       <Logo2 />
-      <div className="fixed top-0 left-0 w-full z-[100]">
+
+      <div className="absolute top-0 left-0 w-full z-20">
         <NavbarAuth />
       </div>
 

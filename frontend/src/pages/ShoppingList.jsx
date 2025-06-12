@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import NavbarAuth from "../components/NavbarAuth";
 import Logo2 from "../components/Logo2";
+import { useShoppingList } from "../hooks/useShoppingList";
 
 const BackgroundImages = () => (
   <>
@@ -13,43 +14,41 @@ const BackgroundImages = () => (
 );
 
 const ShoppingListSection = () => {
-  const [items, setItems] = useState([
-    { id: 1, product: "Mleko", quantity: "1 szt", purchased: false },
-    { id: 2, product: "Chleb", quantity: "2 szt", purchased: true },
-    { id: 3, product: "Jabłka", quantity: "1 kg", purchased: false },
-  ]);
+  const {
+    items,
+    loading,
+    error,
+    purchasedCount,
+    totalCount,
+    addItem,
+    togglePurchased,
+    deleteItem,
+    clearPurchased,
+  } = useShoppingList();
 
   const [newProduct, setNewProduct] = useState("");
   const [newQuantity, setNewQuantity] = useState("");
 
-  const addItem = () => {
+  const handleAddItem = async () => {
     if (newProduct.trim() && newQuantity.trim()) {
-      const newItem = {
-        id: Date.now(),
-        product: newProduct,
-        quantity: newQuantity,
-        purchased: false,
-      };
-      setItems([...items, newItem]);
-      setNewProduct("");
-      setNewQuantity("");
+      try {
+        await addItem(newProduct, newQuantity);
+        setNewProduct("");
+        setNewQuantity("");
+      } catch {}
     }
   };
 
-  const togglePurchased = (id) => {
-    setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, purchased: !item.purchased } : item
-      )
+  if (loading) {
+    return (
+      <main className="relative mt-30 z-10 bg-[#EDEDED] py-10 px-20 max-w-5xl mx-auto rounded-2xl shadow-2xl">
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFC440]"></div>
+          <span className="ml-4 text-gray-600">Ładowanie listy zakupów...</span>
+        </div>
+      </main>
     );
-  };
-
-  const deleteItem = (id) => {
-    setItems(items.filter((item) => item.id !== id));
-  };
-
-  const purchasedCount = items.filter((item) => item.purchased).length;
-  const totalCount = items.length;
+  }
 
   return (
     <main className="relative mt-30 z-10 bg-[#EDEDED] py-10 px-20 max-w-5xl mx-auto rounded-2xl shadow-2xl">
@@ -57,6 +56,12 @@ const ShoppingListSection = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
           Lista Zakupów
         </h1>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
 
         <div className="bg-white rounded-lg p-4 mb-6">
           <div className="flex justify-between items-center mb-2">
@@ -75,6 +80,16 @@ const ShoppingListSection = () => {
               }}
             ></div>
           </div>
+          {purchasedCount > 0 && (
+            <div className="mt-3 flex justify-end">
+              <button
+                onClick={clearPurchased}
+                className="text-sm text-red-600 hover:text-red-800 font-medium"
+              >
+                Usuń kupione produkty
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg p-6 mb-6">
@@ -106,7 +121,7 @@ const ShoppingListSection = () => {
             </div>
             <div className="flex items-end">
               <button
-                onClick={addItem}
+                onClick={handleAddItem}
                 className="bg-[#EFBD4C] hover:bg-yellow-500 text-black rounded-3xl px-6 py-3 w-full font-semibold text-[13px]"
               >
                 DODAJ PRODUKT
@@ -126,7 +141,7 @@ const ShoppingListSection = () => {
           ) : (
             items.map((item) => (
               <div
-                key={item.id}
+                key={item._id}
                 className={`bg-white rounded-lg p-4 flex items-center justify-between shadow-sm transition-all ${
                   item.purchased ? "opacity-60" : ""
                 }`}
@@ -135,7 +150,7 @@ const ShoppingListSection = () => {
                   <input
                     type="checkbox"
                     checked={item.purchased}
-                    onChange={() => togglePurchased(item.id)}
+                    onChange={() => togglePurchased(item._id)}
                     className="w-5 h-5 text-[#FFC440] bg-gray-100 border-gray-300 rounded focus:ring-[#FFC440] focus:ring-2"
                   />
                   <div>
@@ -170,7 +185,7 @@ const ShoppingListSection = () => {
                     {item.purchased ? "Kupione" : "Do kupienia"}
                   </span>
                   <button
-                    onClick={() => deleteItem(item.id)}
+                    onClick={() => deleteItem(item._id)}
                     className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50"
                   >
                     🗑️
@@ -190,7 +205,7 @@ const ShoppingList = () => {
     <div className="bg-[#F6F2E9] min-h-screen w-full flex flex-col items-center overflow-x-hidden">
       <Logo2 />
 
-      <div className="absolute top-0 left-0 w-full z-10">
+      <div className="absolute top-0 left-0 w-full z-20">
         <NavbarAuth />
       </div>
 
