@@ -9,7 +9,7 @@ const {
 } = require("../controllers/myPlansController");
 const { requireAuth } = require("../middleware/requireAuth");
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 router.post("/", createMyPlan);
 router.get("/", getMyPlans);

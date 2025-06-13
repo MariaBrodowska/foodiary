@@ -5,15 +5,19 @@ const {
   getUserData,
   addShoppingItem,
   deactivateAccount,
+  updateUserData,
+  changePassword,
 } = require("../controllers/userController");
-const { requireAuth } = require("../middleware/requireAuth");
+// const { requireAuth } = require("../middleware/requireAuth");
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 router.get("/email", getUserEmail);
 router.get("/userData", getUserData);
 router.get("/addItem", addShoppingItem);
 router.post("/deactivate", deactivateAccount);
+router.put("/profile", updateUserData);
+router.put("/change-password", changePassword);
 
 //sprawdzenie autoryzacji
 router.get("/check", (req, res) => {

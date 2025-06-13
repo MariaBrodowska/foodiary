@@ -26,36 +26,45 @@ const userSchema = new mongoose.Schema({
   },
   sex: {
     type: String,
-    required: true,
-    enum: ["female", "male"],
-    message: "Wybierz poprawną płeć",
+    required: [true, "Płeć jest wymagana"],
+    enum: {
+      values: ["female", "male"],
+      message: "Wybierz poprawną płeć",
+    },
   },
   activity: {
     type: String,
-    required: true,
-    enum: ["high", "moderate", "low"],
-    message: "Wybierz poprawny poziom aktywności",
+    required: [true, "Aktywność jest wymagana"],
+    enum: {
+      values: ["high", "moderate", "low"],
+      message: "Wybierz poprawny poziom aktywności",
+    },
   },
   height: {
     type: Number,
-    required: true,
-    min: [0, "Wzrost musi być większy niż 0"],
+    required: [true, "Wzrost jest wymagany"],
+    min: [100, "Wzrost musi być większy niż 100 cm"],
+    max: [250, "Wzrost nie może być większy niż 250 cm"],
   },
   weight: {
     type: Number,
-    required: true,
-    min: [0, "Waga musi być większa niż 0"],
+    required: [true, "Waga jest wymagana"],
+    min: [30, "Waga musi być większa niż 30 kg"],
+    max: [300, "Waga nie może być większa niż 300 kg"],
   },
   goal: {
     type: String,
-    required: true,
-    enum: ["maintainWeight", "loseWeight", "gainWeight"],
-    message: "Wybierz poprawny cel",
+    required: [true, "Cel jest wymagany"],
+    enum: {
+      values: ["maintainWeight", "loseWeight", "gainWeight"],
+      message: "Wybierz poprawny cel",
+    },
   },
   age: {
     type: Number,
-    required: true,
-    min: [0, "Wiek musi być większy niż 13"],
+    required: [true, "Wiek jest wymagany"],
+    min: [13, "Wiek musi być większy niż 13"],
+    max: [120, "Wiek nie może być większy niż 120"],
   },
   additionalData: {
     tdee: { type: Number },
@@ -205,6 +214,28 @@ userSchema.statics.updateUser = async function (id, updates) {
   }
 
   await user.save();
+  return user;
+};
+
+userSchema.statics.login = async function (email, password) {
+  if (!email || !password) {
+    throw Error("Wszystkie pola muszą być uzupełnione");
+  }
+
+  const user = await this.findOne({ email });
+  if (!user) {
+    throw Error("Nieprawidłowy email");
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    throw Error("Nieprawidłowe hasło");
+  }
+
+  if (!user.isActive) {
+    throw Error("Konto zostało dezaktywowane");
+  }
+
   return user;
 };
 

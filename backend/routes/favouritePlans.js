@@ -5,9 +5,9 @@ const {
   removeFavoritePlan,
   getFavoritePlans,
 } = require("../controllers/favoritePlansController");
-const { requireAuth } = require("../middleware/requireAuth");
+// const { requireAuth } = require("../middleware/requireAuth");
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 router.post("/", addFavoritePlan);
 router.get("/", getFavoritePlans);

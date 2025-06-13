@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { requireAuth } = require("../middleware/requireAuth");
+// const { requireAuth } = require("../middleware/requireAuth");
 const {
   getShoppingItems,
   addShoppingItem,
@@ -9,7 +9,7 @@ const {
   clearPurchased,
 } = require("../controllers/shoppingController");
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 router.get("/", getShoppingItems);
 router.post("/", addShoppingItem);

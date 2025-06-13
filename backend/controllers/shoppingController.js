@@ -28,6 +28,17 @@ const addShoppingItem = async (req, res) => {
     res.status(201).json(savedItem);
   } catch (error) {
     console.error("Error saving item:", error);
+
+    //walidacja
+    if (error.name === "ValidationError") {
+      const validationErrors = Object.values(error.errors).map(
+        (err) => err.message
+      );
+      return res.status(400).json({
+        error: validationErrors.join(". "),
+      });
+    }
+    res.status(500).json({ error: "Błąd podczas dodawania produktu" });
   }
 };
 
@@ -42,7 +53,6 @@ const togglePurchased = async (req, res) => {
 
     item.purchased = !item.purchased;
     const updatedItem = await item.save();
-
     res.status(200).json(updatedItem);
   } catch (error) {
     res.status(500).json({ error: "Błąd podczas aktualizacji elementu" });

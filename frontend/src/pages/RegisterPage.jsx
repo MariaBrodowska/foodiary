@@ -1,162 +1,247 @@
 import React, { useState } from "react";
-import WelcomePageBackground from "../components/WelcomePageBackground";
-import { useNavigate, Link } from "react-router-dom";
-import Logo1 from "../components/Logo1";
-import Button from "../components/Button";
-import Input from "../components/Input";
-import NavbarNotAuth from "../components/NavbarNotAuth";
-import axios from "axios";
+import WelcomePageBackground from "../components/common/WelcomePageBackground";
+import { Link } from "react-router-dom";
+import Logo1 from "../components/common/Logo1";
+import Button from "../components/auth/Button";
+import Input from "../components/common/Input";
+import NavbarNotAuth from "../components/nav/NavbarNotAuth";
+import { useRegister } from "../hooks/useRegister";
 
 const RegisterPage = () => {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: "",
-        password: "",
-        sex: "",
-        activity: "",
-        height: "",
-        weight: "",
-        goal: "",
-        age: ""
-    });
-    const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+  const { signup, isLoading, error } = useRegister();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    sex: "",
+    activity: "",
+    height: "",
+    weight: "",
+    goal: "",
+    age: "",
+  });
+  const [validationError, setValidationError] = useState(null);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: value
-        }));
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+    //gdy zaczyna wprowadzac czyscimy bledy
+    if (validationError) {
+      setValidationError(null);
+    }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        if (!formData.email || !formData.password || !formData.sex || !formData.activity || !formData.height || !formData.weight || !formData.goal || !formData.age) {
-            setError('Wszystkie pola są wymagane');
-            return;
-        }
+    if (
+      !formData.email ||
+      !formData.password ||
+      !formData.sex ||
+      !formData.activity ||
+      !formData.height ||
+      !formData.weight ||
+      !formData.goal ||
+      !formData.age
+    ) {
+      setValidationError("Wszystkie pola są wymagane");
+      return;
+    }
 
-        console.log("Przeslane dane:", formData);
-        setIsLoading(true);
-        setError(null);
-    
-        try {
-            const response = await axios.post('http://localhost:3000/api/user/register', formData, {
-                withCredentials: true
-            });
-    
-            console.log('Rejestracja udana:', response.data);
-            setIsLoading(false);
-            
-            navigate('/dashboard');
-            
-        } catch (err) {
-            console.error('Błąd podczas rejestracji:', err);
-            setIsLoading(false);
-            
-            if (err.response && err.response.data && err.response.data.error) {
-                setError(err.response.data.error);
-            } else {
-                setError('Wystąpił błąd podczas rejestracji');
-            }
-        }
-    };
+    console.log("Przeslane dane:", formData);
 
-    return (
-        <div className='bg-[#F6F2E9] min-h-screen w-full relative flex justify-center items-center overflow-x-hidden'>
-            <WelcomePageBackground />
-            <Logo1/>
-            <NavbarNotAuth/>
-
-            <form onSubmit={handleSubmit} className="flex flex-col relative items-center w-2/3 max-w-3xl bg-[#ffffff] rounded-[30px] lg:px-20 lg:py-13 sm:p-15 shadow-[0px_4px_30px_10px_rgba(0,0,0,0.15)] mt-30 mb-20">
-                <p className="text-[#000000] font-bold lg:text-[48px] sm:text-[38px] pb-5">Rejestracja</p>
-                <p className="text-[#979797] font-medium lg:text-[24px] sm:text-[20px] text-center">
-                    Witaj! Uzupełnij swoje dane, aby zarządzać dietą
-                </p>
-
-                {error && (
-                    <div className="w-full p-4 my-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                        {error}
-                    </div>
-                )}
-
-                <Input label={"Email"} name={"email"} value={formData.email} onChange={handleChange} />
-                <Input label={"Hasło"} name={"password"} type="password" value={formData.password} onChange={handleChange} />
-
-                <div className="flex justify-between w-full space-x-10">
-                    <div className="flex flex-col w-1/4">
-                        <label htmlFor="sex" className="text-[#000000] font-semibold text-[22px] self-start pt-8 pb-2">Płeć</label>
-                        <select name="sex" id="sex" value={formData.sex} onChange={handleChange} className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-4">
-                            <option value="">Wybierz</option>
-                            <option value="female">Kobieta</option>
-                            <option value="male">Mężczyzna</option>
-                        </select>
-                    </div>
-
-                    <div className="flex flex-col w-3/4">
-                        <label htmlFor="activity" className="text-[#000000] font-semibold text-[22px] self-start pt-8 pb-2">Aktywność fizyczna</label>
-                        <select name="activity" id="activity" value={formData.activity} onChange={handleChange} className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-4">
-                            <option value="">Wybierz</option>
-                            <option value="high">Wysoka (treningi 5-7 razy w tygodniu)</option>
-                            <option value="moderate">Umiarkowana (treningi 1-3 razy w tygodniu)</option>
-                            <option value="low">Niska (siedzący tryb życia)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="flex justify-between w-full space-x-10">
-                    <div className="flex flex-col w-1/2">
-                        <p className="text-black font-semibold text-[22px] self-start pt-8 pb-2">Wzrost</p>
-                        <div className="flex items-center rounded-[20px] py-4 px-4 w-full border-1 border-solid border-[#000000]">
-                            <input type="number" id="height" name="height" value={formData.height} onChange={handleChange} className="flex-grow outline-none text-black bg-transparent" />
-                            <span className="px-2 font-semibold text-black">cm</span>
-                        </div>
-                    </div>
-                    <div className="flex flex-col w-1/2">
-                        <p className="text-black font-semibold text-[22px] self-start pt-8 pb-2">Waga</p>
-                        <div className="flex items-center rounded-[20px] py-4 px-4 w-full border-1 border-solid border-[#000000]">
-                            <input type="number" id="weight" name="weight" value={formData.weight} onChange={handleChange} className="flex-grow outline-none text-black bg-transparent" />
-                            <span className="px-2 font-semibold text-black">kg</span>
-                        </div>
-                    </div>
-                </div>
-
-          
-
-
-                    <div className="flex justify-between w-full space-x-10">
-                    <div className="flex flex-col w-1/2">
-                        <p className="text-black font-semibold text-[22px] self-start pt-8 pb-2">Wiek</p>
-                        <div className="flex items-center rounded-[20px] py-4 px-4 w-full border-1 border-solid border-[#000000]">
-                            <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} className="flex-grow outline-none text-black bg-transparent" />
-                            <span className="px-2 font-semibold text-black">lat(a)</span>
-                        </div>
-                    </div>
-                    <div className="flex flex-col w-1/2">
-                        <label htmlFor="goal" className="text-[#000000] font-semibold text-[22px] self-start pt-8 pb-2">Cel</label>
-                        <select name="goal" id="goal" value={formData.goal} onChange={handleChange} className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-4">
-                            <option value="">Wybierz</option>
-                            <option value="maintainWeight">Utrzymać wagę</option>
-                            <option value="loseWeight">Schudnąć</option>
-                            <option value="gainWeight">Przytuć</option>
-                        </select>
-                    </div>
-                </div>
-                <Button 
-                    value={isLoading ? "PRZETWARZANIE..." : "ZAŁÓŻ KONTO"} 
-                    disabled={isLoading}
-                    extraClasses={isLoading ? "opacity-70 cursor-not-allowed" : ""}
-                />
-
-                <p className="text-[#000000] font-semibold text-[20px] mt-8 text-center">
-                    Masz już konto?
-                    <Link to="/login" className="font-extrabold cursor-pointer"> Zaloguj się</Link>
-                </p>
-            </form>
-        </div>
+    await signup(
+      formData.email,
+      formData.password,
+      formData.sex,
+      formData.activity,
+      formData.height,
+      formData.weight,
+      formData.goal,
+      formData.age
     );
+  };
+
+  return (
+    <div className="bg-[#F6F2E9] min-h-screen w-full relative flex justify-center items-center overflow-x-hidden px-4">
+      <WelcomePageBackground />
+      <Logo1 />
+      <NavbarNotAuth />
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col relative items-center w-full max-w-xs sm:max-w-lg lg:max-w-2xl xl:max-w-3xl bg-[#ffffff] rounded-[20px] sm:rounded-[30px] px-4 sm:px-8 lg:px-12 xl:px-20 py-6 sm:py-8 lg:py-10 xl:py-13 shadow-[0px_4px_30px_10px_rgba(0,0,0,0.15)] mt-8 sm:mt-12 lg:mt-30 mb-8 sm:mb-12 lg:mb-20"
+      >
+        <p className="text-[#000000] font-bold text-2xl sm:text-3xl lg:text-4xl xl:text-[48px] pb-3 sm:pb-4 lg:pb-5 text-center">
+          Rejestracja
+        </p>
+        <p className="text-[#979797] font-medium text-sm sm:text-base lg:text-xl xl:text-[24px] text-center mb-4 sm:mb-6">
+          Witaj! Uzupełnij swoje dane, aby zarządzać dietą
+        </p>
+
+        {(error || validationError) && (
+          <div className="w-full p-3 sm:p-4 my-2 sm:my-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+            {error || validationError}
+          </div>
+        )}
+
+        <Input
+          label={"Email"}
+          name={"email"}
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <Input
+          label={"Hasło"}
+          name={"password"}
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+        />
+
+        <div className="flex flex-col lg:flex-row justify-between w-full gap-4 lg:gap-10">
+          <div className="flex flex-col w-full lg:w-1/4">
+            <label
+              htmlFor="sex"
+              className="text-[#000000] font-semibold text-lg sm:text-xl lg:text-[22px] self-start pt-4 sm:pt-6 lg:pt-8 pb-2"
+            >
+              Płeć
+            </label>
+            <select
+              name="sex"
+              id="sex"
+              value={formData.sex}
+              onChange={handleChange}
+              className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-3 sm:p-4 text-sm sm:text-base"
+            >
+              <option value="">Wybierz</option>
+              <option value="female">Kobieta</option>
+              <option value="male">Mężczyzna</option>
+            </select>
+          </div>
+
+          <div className="flex flex-col w-full lg:w-3/4">
+            <label
+              htmlFor="activity"
+              className="text-[#000000] font-semibold text-lg sm:text-xl lg:text-[22px] self-start pt-4 sm:pt-6 lg:pt-8 pb-2"
+            >
+              Aktywność fizyczna
+            </label>
+            <select
+              name="activity"
+              id="activity"
+              value={formData.activity}
+              onChange={handleChange}
+              className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-3 sm:p-4 text-sm sm:text-base"
+            >
+              <option value="">Wybierz</option>
+              <option value="high">
+                Wysoka (treningi 5-7 razy w tygodniu)
+              </option>
+              <option value="moderate">
+                Umiarkowana (treningi 1-3 razy w tygodniu)
+              </option>
+              <option value="low">Niska (siedzący tryb życia)</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between w-full gap-4 sm:gap-10">
+          <div className="flex flex-col w-full sm:w-1/2">
+            <p className="text-black font-semibold text-lg sm:text-xl lg:text-[22px] self-start pt-4 sm:pt-6 lg:pt-8 pb-2">
+              Wzrost
+            </p>
+            <div className="flex items-center rounded-[20px] py-3 sm:py-4 px-3 sm:px-4 w-full border-1 border-solid border-[#000000]">
+              <input
+                type="number"
+                id="height"
+                name="height"
+                value={formData.height}
+                onChange={handleChange}
+                className="flex-grow outline-none text-black bg-transparent text-sm sm:text-base"
+              />
+              <span className="px-2 font-semibold text-black text-sm sm:text-base">
+                cm
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col w-full sm:w-1/2">
+            <p className="text-black font-semibold text-lg sm:text-xl lg:text-[22px] self-start pt-4 sm:pt-6 lg:pt-8 pb-2">
+              Waga
+            </p>
+            <div className="flex items-center rounded-[20px] py-3 sm:py-4 px-3 sm:px-4 w-full border-1 border-solid border-[#000000]">
+              <input
+                type="number"
+                id="weight"
+                name="weight"
+                value={formData.weight}
+                onChange={handleChange}
+                className="flex-grow outline-none text-black bg-transparent text-sm sm:text-base"
+              />
+              <span className="px-2 font-semibold text-black text-sm sm:text-base">
+                kg
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between w-full gap-4 sm:gap-10">
+          <div className="flex flex-col w-full sm:w-1/2">
+            <p className="text-black font-semibold text-lg sm:text-xl lg:text-[22px] self-start pt-4 sm:pt-6 lg:pt-8 pb-2">
+              Wiek
+            </p>
+            <div className="flex items-center rounded-[20px] py-3 sm:py-4 px-3 sm:px-4 w-full border-1 border-solid border-[#000000]">
+              <input
+                type="number"
+                id="age"
+                name="age"
+                value={formData.age}
+                onChange={handleChange}
+                className="flex-grow outline-none text-black bg-transparent text-sm sm:text-base"
+              />
+              <span className="px-2 font-semibold text-black text-sm sm:text-base">
+                lat(a)
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col w-full sm:w-1/2">
+            <label
+              htmlFor="goal"
+              className="text-[#000000] font-semibold text-lg sm:text-xl lg:text-[22px] self-start pt-4 sm:pt-6 lg:pt-8 pb-2"
+            >
+              Cel
+            </label>
+            <select
+              name="goal"
+              id="goal"
+              value={formData.goal}
+              onChange={handleChange}
+              className="border-1 border-solid border-[#000000] rounded-[20px] w-full p-3 sm:p-4 text-sm sm:text-base"
+            >
+              <option value="">Wybierz</option>
+              <option value="maintainWeight">Utrzymać wagę</option>
+              <option value="loseWeight">Schudnąć</option>
+              <option value="gainWeight">Przytuć</option>
+            </select>
+          </div>
+        </div>
+        <Button
+          value={isLoading ? "PRZETWARZANIE..." : "ZAŁÓŻ KONTO"}
+          disabled={isLoading}
+          extraClasses={isLoading ? "opacity-70 cursor-not-allowed" : ""}
+        />
+        <p className="text-[#000000] font-semibold text-sm sm:text-base lg:text-[20px] mt-4 sm:mt-6 lg:mt-8 text-center">
+          Masz już konto?
+          <Link to="/login" className="font-extrabold cursor-pointer ml-1">
+            Zaloguj się
+          </Link>
+        </p>
+      </form>
+    </div>
+  );
 };
 
 export default RegisterPage;

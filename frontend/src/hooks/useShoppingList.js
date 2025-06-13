@@ -9,9 +9,12 @@ export const useShoppingList = () => {
   const fetchItems = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:3000/api/shopping", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:3000/api/user/shopping",
+        {
+          withCredentials: true,
+        }
+      );
       setItems(response.data);
       setError(null);
     } catch (err) {
@@ -26,7 +29,7 @@ export const useShoppingList = () => {
     try {
       console.log("Attempting to add item:", { product, quantity });
       const response = await axios.post(
-        "http://localhost:3000/api/shopping",
+        "http://localhost:3000/api/user/shopping",
         {
           product,
           quantity,
@@ -43,11 +46,14 @@ export const useShoppingList = () => {
       console.error("Error adding item:", err);
       console.error("Error response:", err.response?.data);
       console.error("Error status:", err.response?.status);
-      setError(
-        `Błąd podczas dodawania produktu: ${
-          err.response?.data?.error || err.message
-        }`
-      );
+      let errorMessage = "Błąd podczas dodawania produktu";
+
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
       throw err;
     }
   };
@@ -55,7 +61,7 @@ export const useShoppingList = () => {
   const togglePurchased = async (id) => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/shopping/${id}/toggle`,
+        `http://localhost:3000/api/user/shopping/${id}/toggle`,
         {},
         {
           withCredentials: true,
@@ -72,7 +78,7 @@ export const useShoppingList = () => {
 
   const deleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/shopping/${id}`, {
+      await axios.delete(`http://localhost:3000/api/user/shopping/${id}`, {
         withCredentials: true,
       });
       setItems((prev) => prev.filter((item) => item._id !== id));
@@ -84,9 +90,12 @@ export const useShoppingList = () => {
 
   const clearPurchased = async () => {
     try {
-      await axios.delete("http://localhost:3000/api/shopping/purchased/clear", {
-        withCredentials: true,
-      });
+      await axios.delete(
+        "http://localhost:3000/api/user/shopping/purchased/clear",
+        {
+          withCredentials: true,
+        }
+      );
       setItems((prev) => prev.filter((item) => !item.purchased));
     } catch (err) {
       setError("Błąd podczas usuwania kupionych elementów");
@@ -105,6 +114,7 @@ export const useShoppingList = () => {
     items,
     loading,
     error,
+    setError,
     purchasedCount,
     totalCount,
     addItem,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ingredientCategories } from "../data/ingredients";
+import { ingredientCategories } from "../../data/ingredients";
 
 const IngredientSelector = ({ selectedIngredients, onIngredientsChange }) => {
   const [isOpen, setIsOpen] = useState(false);

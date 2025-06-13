@@ -12,11 +12,13 @@ const MyPlansSection = ({ setSelectedPlan }) => {
   const {
     plans,
     loading,
+    error,
     searchQuery,
     setSearchQuery,
     createPlan,
     updatePlan,
     deletePlan,
+    clearError,
   } = useMyPlans();
 
   const {
@@ -34,14 +36,14 @@ const MyPlansSection = ({ setSelectedPlan }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let success = false;
+    let result = null;
     if (editingPlan) {
-      success = await updatePlan(editingPlan._id, formData);
+      result = await updatePlan(editingPlan._id, formData);
     } else {
-      success = await createPlan(formData);
+      result = await createPlan(formData);
     }
 
-    if (success) {
+    if (result.success) {
       resetForm();
       setShowForm(false);
       setEditingPlan(null);
@@ -64,37 +66,46 @@ const MyPlansSection = ({ setSelectedPlan }) => {
     resetForm();
     setEditingPlan(null);
     setShowForm(false);
+    clearError(); //anulowanie czysciemy bledy
   };
 
   const handleAddPlan = () => {
+    clearError(); //nowy plan czyscimy bledy
     setShowForm(true);
   };
 
   return (
-    <main className="relative mt-30 z-10 bg-[#EDEDED] py-10 px-20 max-w-7xl mx-auto rounded-2xl shadow-2xl">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+    <main className="relative mt-20 sm:mt-24 lg:mt-30 z-10 bg-[#EDEDED] py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-12 xl:px-20 max-w-full sm:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto rounded-2xl shadow-2xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
           Moje plany żywieniowe
         </h1>
         <button
           onClick={handleAddPlan}
-          className="bg-[#EFBD4C] hover:bg-yellow-500 text-black px-6 py-3 rounded-3xl font-semibold"
+          className="bg-[#EFBD4C] hover:bg-yellow-500 text-black px-4 sm:px-6 py-2 sm:py-3 rounded-3xl font-semibold text-sm sm:text-base w-full sm:w-auto"
         >
           + Dodaj nowy plan
         </button>
       </div>
 
-      <SearchInput
-        value={searchQuery}
-        onChange={setSearchQuery}
-        placeholder="Szukaj po nazwie..."
-      />
+      <div className="mb-6">
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Szukaj po nazwie..."
+        />
+      </div>
 
       <Modal
         isOpen={showForm}
         onClose={handleCancelForm}
         title={editingPlan ? "Edytuj plan" : "Dodaj nowy plan"}
       >
+        {error && (
+          <div className="w-full p-3 sm:p-4 mb-3 sm:mb-4 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+            {error}
+          </div>
+        )}
         <PlanForm
           formData={formData}
           editingPlan={editingPlan}
@@ -122,30 +133,10 @@ const MyPlansSection = ({ setSelectedPlan }) => {
 const MyPlansPage = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
 
-  const { deletePlan } = useMyPlans();
-
-  const handleEdit = () => {
-    setSelectedPlan(null);
-  };
-
-  const handleDelete = async (planId, planName) => {
-    if (window.confirm(`Czy na pewno chcesz usunąć plan "${planName}"?`)) {
-      const success = await deletePlan(planId);
-      if (success) {
-        setSelectedPlan(null);
-      }
-    }
-  };
-
   if (selectedPlan) {
     return (
       <PageLayout>
-        <PlanDetails
-          plan={selectedPlan}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onBack={() => setSelectedPlan(null)}
-        />
+        <PlanDetails plan={selectedPlan} onBack={() => setSelectedPlan(null)} />
       </PageLayout>
     );
   }

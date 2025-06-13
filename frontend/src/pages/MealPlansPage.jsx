@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import NavbarAuth from "../components/NavbarAuth";
-import Logo2 from "../components/Logo2";
-import MealPlansList from "../components/MealPlansList";
-import IngredientSelector from "../components/IngredientSelector";
+import NavbarAuth from "../components/nav/NavbarAuth";
+import Logo2 from "../components/common/Logo2";
+import MealPlansList from "../components/mealplans/MealPlansList";
+import IngredientSelector from "../components/mealplans/IngredientSelector";
 import { useSearchParams } from "react-router-dom";
 
 const BackgroundImages = () => (
@@ -70,11 +70,14 @@ const DietPlansSection = () => {
   };
 
   return (
-    <main className="relative mt-30 z-10 bg-[#EDEDED] py-10 px-20 max-w-7xl mx-auto rounded-2xl shadow-2xl">
-      <div className="space-y-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <main className="relative mt-20 sm:mt-24 lg:mt-30 z-10 bg-[#EDEDED] py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-12 xl:px-20 max-w-full sm:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto rounded-2xl shadow-2xl">
+      <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           <div>
-            <label htmlFor="diet-type" className="text-gray-700 font-semibold">
+            <label
+              htmlFor="diet-type"
+              className="block text-gray-700 font-semibold text-sm sm:text-base mb-2"
+            >
               Typ diety:
             </label>
             <select
@@ -82,7 +85,7 @@ const DietPlansSection = () => {
               name="dietType"
               value={filters.dietType}
               onChange={handleInputChange}
-              className="border-[#858585] border bg-white rounded-xl px-4 py-3.5 w-full mt-2 text-[13px]"
+              className="border-[#858585] border bg-white rounded-xl px-3 sm:px-4 py-3 sm:py-3.5 w-full text-xs sm:text-sm lg:text-[13px]"
             >
               <option value="">Wszystkie diety</option>
               <option value="vegetarian">Wegetariańska</option>
@@ -95,7 +98,10 @@ const DietPlansSection = () => {
             </select>
           </div>
           <div>
-            <label htmlFor="calories" className="text-gray-700 font-semibold">
+            <label
+              htmlFor="calories"
+              className="block text-gray-700 font-semibold text-sm sm:text-base mb-2"
+            >
               Kalorie dziennie
             </label>
             <input
@@ -105,7 +111,7 @@ const DietPlansSection = () => {
               placeholder="np. 2000"
               value={filters.calories}
               onChange={handleInputChange}
-              className="border-[#858585] border bg-white rounded-xl px-4 py-3 w-full mt-2 text-[13px]"
+              className="border-[#858585] border bg-white rounded-xl px-3 sm:px-4 py-3 w-full text-xs sm:text-sm lg:text-[13px]"
             />
           </div>
         </div>
@@ -118,12 +124,12 @@ const DietPlansSection = () => {
         <div className="flex justify-center">
           <button
             onClick={handleSearch}
-            className="bg-[#EFBD4C] hover:bg-yellow-500 text-black rounded-3xl px-8 py-3 font-semibold text-[13px] w-full md:w-auto"
+            className="bg-[#EFBD4C] hover:bg-yellow-500 text-black rounded-3xl px-6 sm:px-8 py-3 font-semibold text-xs sm:text-sm lg:text-[13px] w-full sm:w-auto max-w-xs"
           >
             SZUKAJ PLANÓW
           </button>
         </div>
-        <hr className="my-8 border-t border-gray-300 border-2" />
+        <hr className="my-6 sm:my-8 border-t border-gray-300 border-2" />
       </div>
       <MealPlansList
         targetCalories={appliedFilters.calories}

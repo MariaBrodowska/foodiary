@@ -1,6 +1,5 @@
 import React from "react";
 
-// Constants moved from utils
 const DIET_TYPES = [
   { value: "", label: "Brak wybranej diety" },
   { value: "vegetarian", label: "Wegetariańska" },
@@ -33,7 +32,7 @@ const MEAL_TYPES = {
   },
 };
 
-const PlanDetails = ({ plan, onEdit, onDelete, onBack }) => {
+const PlanDetails = ({ plan, onBack }) => {
   return (
     <main className="relative mt-30 z-10 bg-[#EDEDED] py-10 px-20 max-w-7xl mx-auto rounded-2xl shadow-2xl">
       <button
@@ -59,20 +58,6 @@ const PlanDetails = ({ plan, onEdit, onDelete, onBack }) => {
                 {plan.dailyCalories} kcal
               </span>
             )}
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => onEdit(plan)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-            >
-              ✏️ Edytuj
-            </button>
-            <button
-              onClick={() => onDelete(plan._id, plan.name)}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-            >
-              🗑️ Usuń
-            </button>
           </div>
         </div>
 

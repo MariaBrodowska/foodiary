@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { translateIngredients } from "../data/ingredients";
-import useLikedPlans from "../hooks/useLikedPlans";
+import { translateIngredients } from "../../data/ingredients";
+import useLikedPlans from "../../hooks/useLikedPlans";
 
 const MealPlansList = ({ targetCalories, diet, ingredients }) => {
   const [mealPlans, setMealPlans] = useState([]);
@@ -32,7 +32,7 @@ const MealPlansList = ({ targetCalories, diet, ingredients }) => {
           baseParams.diet = diet;
         }
 
-        const promises = Array.from({ length: 1 }, (_, index) =>
+        const promises = Array.from({ length: 10 }, (_, index) =>
           axios
             .get("https://api.spoonacular.com/mealplanner/generate", {
               params: baseParams,

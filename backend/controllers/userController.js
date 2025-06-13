@@ -93,10 +93,122 @@ const deactivateAccount = async (req, res) => {
   }
 };
 
+const updateUserData = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    const updates = req.body;
+
+    // Walidacja danych
+    const allowedUpdates = [
+      "email",
+      "sex",
+      "activity",
+      "height",
+      "weight",
+      "goal",
+      "age",
+    ];
+    const updateKeys = Object.keys(updates);
+    const isValidOperation = updateKeys.every((key) =>
+      allowedUpdates.includes(key)
+    );
+
+    if (!isValidOperation) {
+      return res
+        .status(400)
+        .json({ error: "Nieprawidłowe pola do aktualizacji" });
+    }
+
+    const updatedUser = await User.updateUser(userId, updates);
+
+    res.status(200).json({
+      message: "Dane użytkownika zostały zaktualizowane",
+      user: {
+        email: updatedUser.email,
+        sex: updatedUser.sex,
+        activity: updatedUser.activity,
+        height: updatedUser.height,
+        weight: updatedUser.weight,
+        goal: updatedUser.goal,
+        age: updatedUser.age,
+        additionalData: updatedUser.additionalData,
+      },
+    });
+  } catch (error) {
+    console.error("Błąd aktualizacji danych użytkownika:", error);
+    if (error.name === "ValidationError") {
+      const fieldErrors = {};
+
+      //walidacja
+      Object.keys(error.errors).forEach((field) => {
+        fieldErrors[field] = error.errors[field].message;
+      });
+
+      return res.status(400).json({
+        error: "Błędy walidacji",
+        fieldErrors: fieldErrors,
+      });
+    }
+
+    //email juz uzywany
+    if (error.code === 11000) {
+      return res.status(400).json({
+        error: "Email jest już używany",
+        fieldErrors: { email: "Email jest już używany" },
+      });
+    }
+
+    res.status(400).json({ error: error.message });
+  }
+};
+
+const changePassword = async (req, res) => {
+  try {
+    const userId = getUserIdFromToken(req);
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({
+        error: "Nowe hasło jest wymagane",
+        fieldErrors: { newPassword: "Nowe hasło jest wymagane" },
+      });
+    }
+
+    // Użyj funkcji updateUser która ma już walidację hasła
+    const updatedUser = await User.updateUser(userId, {
+      password: newPassword,
+    });
+
+    res.status(200).json({
+      message: "Hasło zostało pomyślnie zmienione",
+    });
+  } catch (error) {
+    console.error("Błąd zmiany hasła:", error);
+
+    // Obsługa błędów walidacji Mongoose
+    if (error.name === "ValidationError") {
+      const fieldErrors = {};
+
+      Object.keys(error.errors).forEach((field) => {
+        fieldErrors[field] = error.errors[field].message;
+      });
+
+      return res.status(400).json({
+        error: "Błędy walidacji",
+        fieldErrors: fieldErrors,
+      });
+    }
+
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getUserEmail,
   getUserData,
   getShoppingList,
   addShoppingItem,
   deactivateAccount,
+  updateUserData,
+  changePassword,
 };

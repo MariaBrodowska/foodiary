@@ -1,6 +1,6 @@
 import React from "react";
-import Logo2 from "../Logo2";
-import NavbarAuth from "../NavbarAuth";
+import Logo2 from "../common/Logo2";
+import NavbarAuth from "../nav/NavbarAuth";
 import BackgroundImages from "../common/BackgroundImages";
 
 const PageLayout = ({ children, title, showBackground = true }) => {

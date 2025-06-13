@@ -50,6 +50,7 @@ const PlanForm = ({
         </label>
         <input
           type="text"
+          placeholder="Wprowadź nazwę planu"
           name="name"
           value={formData.name}
           onChange={onInputChange}
@@ -60,12 +61,13 @@ const PlanForm = ({
 
       <div>
         <label className="block text-gray-700 font-semibold mb-2">
-          Śniadanie *
+          Śniadanie*
         </label>
         <textarea
           name="breakfast"
           value={formData.breakfast}
           onChange={onInputChange}
+          placeholder="Wprowadź składniki i przepisy na śniadanie"
           rows="3"
           className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
           required
@@ -73,13 +75,12 @@ const PlanForm = ({
       </div>
 
       <div>
-        <label className="block text-gray-700 font-semibold mb-2">
-          Obiad *
-        </label>
+        <label className="block text-gray-700 font-semibold mb-2">Obiad*</label>
         <textarea
           name="lunch"
           value={formData.lunch}
           onChange={onInputChange}
+          placeholder="Wprowadź składniki i przepisy na obiad"
           rows="3"
           className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
           required
@@ -88,11 +89,12 @@ const PlanForm = ({
 
       <div>
         <label className="block text-gray-700 font-semibold mb-2">
-          Kolacja *
+          Kolacja*
         </label>
         <textarea
           name="dinner"
           value={formData.dinner}
+          placeholder="Wprowadź składniki i przepisy na kolację"
           onChange={onInputChange}
           rows="3"
           className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
@@ -109,6 +111,7 @@ const PlanForm = ({
             type="number"
             name="dailyCalories"
             value={formData.dailyCalories}
+            placeholder="np. 2000"
             onChange={onInputChange}
             min="800"
             max="5000"

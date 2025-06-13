@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import NavbarAuth from "../components/NavbarAuth";
-import Logo2 from "../components/Logo2";
+import NavbarAuth from "../components/nav/NavbarAuth";
+import Logo2 from "../components/common/Logo2";
 import useUserData from "../hooks/useUserData";
 import axios from "axios";
 
@@ -17,6 +17,9 @@ const BackgroundImages = () => (
 const ProfileSection = () => {
   const { userData, isLoading, refetch } = useUserData();
   const [editMode, setEditMode] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [validationErrors, setValidationErrors] = useState({});
   const [formData, setFormData] = useState({
     email: "",
     sex: "",
@@ -47,21 +50,78 @@ const ProfileSection = () => {
       ...prev,
       [name]: value,
     }));
+
+    //ja wpisujemy to czyscimy bledy walidacji
+    if (validationErrors[name]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
+
+    //czyszczenie komunikatow bledu i sukcesu
+    if (error) setError(null);
+    if (success) setSuccess(null);
   };
 
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.put("/api/user/profile", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.put("http://localhost:3000/api/user/profile", formData, {
+        withCredentials: true,
       });
+
       setEditMode(false);
-      refetch();
+      setSuccess("Dane zostały pomyślnie zaktualizowane");
+      setError(null);
+      setValidationErrors({});
+
+      //odswiezenie zmian
+      await refetch();
+
+      //usuwanie komunikatu po 3s
+      setTimeout(() => setSuccess(null), 3000);
     } catch (error) {
       console.error("Błąd aktualizacji profilu:", error);
+
+      let errorMessage = "Wystąpił błąd podczas aktualizacji danych";
+      let fieldErrors = {};
+
+      if (error.response?.data) {
+        const { error: serverError, fieldErrors: serverFieldErrors } =
+          error.response.data;
+
+        if (serverFieldErrors) {
+          fieldErrors = serverFieldErrors;
+          errorMessage = "Proszę poprawić błędy w formularzu";
+        } else if (serverError) {
+          errorMessage = serverError;
+        }
+      }
+
+      setError(errorMessage);
+      setValidationErrors(fieldErrors);
+      setSuccess(null);
     }
+  };
+
+  const handleCancel = () => {
+    //przywrocenie ogryginalnych dannych
+    if (userData) {
+      setFormData({
+        email: userData.email || "",
+        sex: userData.sex || "",
+        activity: userData.activity || "",
+        height: userData.height || "",
+        weight: userData.weight || "",
+        goal: userData.goal || "",
+        age: userData.age || "",
+      });
+    }
+
+    setEditMode(false);
+    setError(null);
+    setSuccess(null);
+    setValidationErrors({});
   };
 
   if (isLoading) {
@@ -69,201 +129,275 @@ const ProfileSection = () => {
   }
 
   return (
-    <main className="relative mt-30 z-10 bg-[#EDEDED] py-10 px-20 max-w-6xl mx-auto rounded-2xl shadow-2xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+    <main className="relative mt-20 sm:mt-24 lg:mt-30 z-10 bg-[#EDEDED] py-6 sm:py-8 lg:py-10 px-4 sm:px-6 lg:px-12 xl:px-20 max-w-full sm:max-w-4xl lg:max-w-6xl mx-auto rounded-2xl shadow-2xl">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">
           Mój Profil
         </h1>
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg p-6 text-center">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">TDEE</h3>
-              <p className="text-3xl font-bold text-[#FFC440]">
-                {userData?.additionalData?.tdee || 0}
-              </p>
-              <p className="text-sm text-gray-500">kcal/dzień</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 text-center">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Cel Kaloryczny
-              </h3>
-              <p className="text-3xl font-bold text-[#FFC440]">
-                {userData?.additionalData?.targetCalories || 0}
-              </p>
-              <p className="text-sm text-gray-500">kcal/dzień</p>
-            </div>
-            <div className="bg-white rounded-lg p-6 text-center">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                Nawodnienie
-              </h3>
-              <p className="text-3xl font-bold text-[#FFC440]">
-                {userData?.additionalData?.waterIntake || 0}
-              </p>
-              <p className="text-sm text-gray-500">ml/dzień</p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg p-4 sm:p-6 text-center">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">
+              TDEE
+            </h3>
+            <p className="text-2xl sm:text-3xl font-bold text-[#FFC440]">
+              {userData?.additionalData?.tdee || 0}
+            </p>
+            <p className="text-xs sm:text-sm text-gray-500">kcal/dzień</p>
           </div>
+          <div className="bg-white rounded-lg p-4 sm:p-6 text-center">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">
+              Cel Kaloryczny
+            </h3>
+            <p className="text-2xl sm:text-3xl font-bold text-[#FFC440]">
+              {userData?.additionalData?.targetCalories || 0}
+            </p>
+            <p className="text-xs sm:text-sm text-gray-500">kcal/dzień</p>
+          </div>
+          <div className="bg-white rounded-lg p-4 sm:p-6 text-center">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-700 mb-2">
+              Nawodnienie
+            </h3>
+            <p className="text-2xl sm:text-3xl font-bold text-[#FFC440]">
+              {userData?.additionalData?.waterIntake || 0}
+            </p>
+            <p className="text-xs sm:text-sm text-gray-500">ml/dzień</p>
+          </div>
+        </div>
 
-          <div className="bg-white rounded-lg p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">
-                Dane osobowe
-              </h2>
-              <button
-                onClick={() => (editMode ? handleSave() : setEditMode(true))}
-                className="bg-[#EFBD4C] hover:bg-yellow-500 text-black px-6 py-2 rounded-3xl font-semibold text-sm"
-              >
-                {editMode ? "ZAPISZ" : "EDYTUJ"}
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                  className={`w-full px-4 py-3 rounded-xl border ${
-                    editMode
-                      ? "border-[#858585] bg-white"
-                      : "border-gray-300 bg-gray-100"
-                  } text-sm`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Płeć
-                </label>
-                <select
-                  name="sex"
-                  value={formData.sex}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                  className={`w-full px-4 py-3 rounded-xl border ${
-                    editMode
-                      ? "border-[#858585] bg-white"
-                      : "border-gray-300 bg-gray-100"
-                  } text-sm`}
-                >
-                  <option value="male">Mężczyzna</option>
-                  <option value="female">Kobieta</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Wiek
-                </label>
-                <input
-                  type="number"
-                  name="age"
-                  value={formData.age}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                  className={`w-full px-4 py-3 rounded-xl border ${
-                    editMode
-                      ? "border-[#858585] bg-white"
-                      : "border-gray-300 bg-gray-100"
-                  } text-sm`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Wzrost (cm)
-                </label>
-                <input
-                  type="number"
-                  name="height"
-                  value={formData.height}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                  className={`w-full px-4 py-3 rounded-xl border ${
-                    editMode
-                      ? "border-[#858585] bg-white"
-                      : "border-gray-300 bg-gray-100"
-                  } text-sm`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Waga (kg)
-                </label>
-                <input
-                  type="number"
-                  name="weight"
-                  value={formData.weight}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                  className={`w-full px-4 py-3 rounded-xl border ${
-                    editMode
-                      ? "border-[#858585] bg-white"
-                      : "border-gray-300 bg-gray-100"
-                  } text-sm`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Aktywność
-                </label>
-                <select
-                  name="activity"
-                  value={formData.activity}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                  className={`w-full px-4 py-3 rounded-xl border ${
-                    editMode
-                      ? "border-[#858585] bg-white"
-                      : "border-gray-300 bg-gray-100"
-                  } text-sm`}
-                >
-                  <option value="low">Niska aktywność</option>
-                  <option value="moderate">Umiarkowana aktywność</option>
-                  <option value="high">Wysoka aktywność</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">
-                  Cel
-                </label>
-                <select
-                  name="goal"
-                  value={formData.goal}
-                  onChange={handleInputChange}
-                  disabled={!editMode}
-                  className={`w-full px-4 py-3 rounded-xl border ${
-                    editMode
-                      ? "border-[#858585] bg-white"
-                      : "border-gray-300 bg-gray-100"
-                  } text-sm`}
-                >
-                  <option value="maintainWeight">Utrzymanie wagi</option>
-                  <option value="loseWeight">Utrata wagi</option>
-                  <option value="gainWeight">Przyrost wagi</option>
-                </select>
-              </div>
-            </div>
-
+        <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4">
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+              Dane osobowe
+            </h2>
+            <button
+              onClick={() => (editMode ? handleSave() : setEditMode(true))}
+              className="bg-[#EFBD4C] hover:bg-yellow-500 text-black px-4 sm:px-6 py-2 rounded-3xl font-semibold text-sm w-full sm:w-auto"
+            >
+              {editMode ? "ZAPISZ" : "EDYTUJ"}
+            </button>
             {editMode && (
-              <div className="mt-6 flex justify-end space-x-4">
-                <button
-                  onClick={() => setEditMode(false)}
-                  className="px-6 py-2 rounded-3xl border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold text-sm"
-                >
-                  ANULUJ
-                </button>
-              </div>
+              <button
+                onClick={handleCancel}
+                className="px-4 sm:px-6 py-2 rounded-3xl border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold text-sm w-full sm:w-auto"
+              >
+                ANULUJ
+              </button>
             )}
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 sm:p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 p-3 sm:p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-sm">
+              {success}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                disabled={!editMode}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-sm ${
+                  validationErrors.email
+                    ? "border-red-500"
+                    : editMode
+                    ? "border-[#858585] bg-white"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              />
+              {validationErrors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.email}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
+                Płeć
+              </label>
+              <select
+                name="sex"
+                value={formData.sex}
+                onChange={handleInputChange}
+                disabled={!editMode}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-sm ${
+                  validationErrors.sex
+                    ? "border-red-500"
+                    : editMode
+                    ? "border-[#858585] bg-white"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              >
+                <option value="male">Mężczyzna</option>
+                <option value="female">Kobieta</option>
+              </select>
+              {validationErrors.sex && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.sex}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
+                Wiek
+              </label>
+              <input
+                type="number"
+                name="age"
+                value={formData.age}
+                onChange={handleInputChange}
+                disabled={!editMode}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-sm ${
+                  validationErrors.age
+                    ? "border-red-500"
+                    : editMode
+                    ? "border-[#858585] bg-white"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              />
+              {validationErrors.age && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.age}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
+                Wzrost (cm)
+              </label>
+              <input
+                type="number"
+                name="height"
+                value={formData.height}
+                onChange={handleInputChange}
+                disabled={!editMode}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-sm ${
+                  validationErrors.height
+                    ? "border-red-500"
+                    : editMode
+                    ? "border-[#858585] bg-white"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              />
+              {validationErrors.height && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.height}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
+                Waga (kg)
+              </label>
+              <input
+                type="number"
+                name="weight"
+                value={formData.weight}
+                onChange={handleInputChange}
+                disabled={!editMode}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-sm ${
+                  validationErrors.weight
+                    ? "border-red-500"
+                    : editMode
+                    ? "border-[#858585] bg-white"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              />
+              {validationErrors.weight && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.weight}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
+                Aktywność
+              </label>
+              <select
+                name="activity"
+                value={formData.activity}
+                onChange={handleInputChange}
+                disabled={!editMode}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-sm ${
+                  validationErrors.activity
+                    ? "border-red-500"
+                    : editMode
+                    ? "border-[#858585] bg-white"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              >
+                <option value="low">Niska aktywność</option>
+                <option value="moderate">Umiarkowana aktywność</option>
+                <option value="high">Wysoka aktywność</option>
+              </select>
+              {validationErrors.activity && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.activity}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2 text-sm sm:text-base">
+                Cel
+              </label>
+              <select
+                name="goal"
+                value={formData.goal}
+                onChange={handleInputChange}
+                disabled={!editMode}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border text-sm ${
+                  validationErrors.goal
+                    ? "border-red-500"
+                    : editMode
+                    ? "border-[#858585] bg-white"
+                    : "border-gray-300 bg-gray-100"
+                }`}
+              >
+                <option value="maintainWeight">Utrzymanie wagi</option>
+                <option value="loseWeight">Utrata wagi</option>
+                <option value="gainWeight">Przyrost wagi</option>
+              </select>
+              {validationErrors.goal && (
+                <p className="text-red-500 text-xs mt-1">
+                  {validationErrors.goal}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* {editMode && (
+            <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
+              <button
+                onClick={() => (editMode ? handleSave() : setEditMode(true))}
+                className="bg-[#EFBD4C] hover:bg-yellow-500 text-black px-4 sm:px-6 py-2 rounded-3xl font-semibold text-sm order-2 sm:order-1"
+              >
+                ZAPISZ
+              </button>
+              <button
+                onClick={handleCancel}
+                className="px-4 sm:px-6 py-2 rounded-3xl border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold text-sm order-1 sm:order-2"
+              >
+                ANULUJ
+              </button>
+            </div>
+          )} */}
         </div>
       </div>
     </main>
